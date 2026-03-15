@@ -9,8 +9,8 @@ const PgSession = connectPgSimple(session);
 const app: Express = express();
 
 app.use(cors({ origin: true, credentials: true }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 const sessionSecret = process.env["SESSION_SECRET"] ?? "dev-fallback-secret";
 

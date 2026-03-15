@@ -7,7 +7,7 @@ const __dirname = dirname(__filename);
 
 config({ path: resolve(__dirname, "../../../.env") });
 
-import app from "./app";
+const { default: app } = await import("./app");
 
 const rawPort = process.env["PORT"] ?? "8080";
 
