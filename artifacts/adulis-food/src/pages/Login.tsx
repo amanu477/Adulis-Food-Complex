@@ -6,8 +6,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { getGetMeQueryKey, getGetCartQueryKey } from "@workspace/api-client-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Phone, Lock } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function Login() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -34,7 +36,7 @@ export default function Login() {
           setLocation(data.role === "admin" ? "/admin" : "/");
         },
         onError: (err: any) => {
-          setError(err?.data?.error ?? "Invalid credentials");
+          setError(err?.data?.error ?? t("login.invalidCredentials"));
         },
       }
     );
@@ -54,8 +56,8 @@ export default function Login() {
             alt="Logo"
             className="h-16 mx-auto mb-4"
           />
-          <h1 className="text-3xl font-display font-bold text-foreground">Welcome Back</h1>
-          <p className="text-muted-foreground mt-1">Sign in to continue</p>
+          <h1 className="text-3xl font-display font-bold text-foreground">{t("login.welcomeBack")}</h1>
+          <p className="text-muted-foreground mt-1">{t("login.signInToContinue")}</p>
         </div>
 
         {error && (
@@ -70,7 +72,7 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Phone Number or Email</label>
+            <label className="block text-sm font-medium text-foreground mb-1">{t("login.phoneOrEmail")}</label>
             <div className="relative">
               <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
@@ -84,7 +86,7 @@ export default function Login() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Password</label>
+            <label className="block text-sm font-medium text-foreground mb-1">{t("login.password")}</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
@@ -102,17 +104,17 @@ export default function Login() {
             disabled={loginMutation.isPending}
             className="w-full bg-primary text-white font-semibold py-3 rounded-xl hover:bg-primary/90 transition disabled:opacity-60 shadow-lg shadow-primary/30"
           >
-            {loginMutation.isPending ? "Signing in…" : "Sign In"}
+            {loginMutation.isPending ? t("login.signingIn") : t("login.signIn")}
           </button>
         </form>
 
         <p className="text-center text-sm text-muted-foreground mt-6">
-          Don't have an account?{" "}
-          <Link href="/register" className="text-primary font-semibold hover:underline">Register with Phone</Link>
+          {t("login.noAccount")}{" "}
+          <Link href="/register" className="text-primary font-semibold hover:underline">{t("login.registerWithPhone")}</Link>
         </p>
 
         <div className="mt-4 p-3 bg-muted/50 rounded-xl text-center">
-          <p className="text-xs text-muted-foreground">Admin login: <span className="font-medium">admin@adulis.com</span></p>
+          <p className="text-xs text-muted-foreground">{t("login.adminHint")} <span className="font-medium">admin@adulis.com</span></p>
         </div>
       </motion.div>
     </div>

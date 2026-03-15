@@ -10,48 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useContact, contactSchema, type ContactInput } from "@/hooks/use-contact";
+import { useTranslation } from "react-i18next";
 
-const contactInfo = [
-  {
-    icon: MapPin,
-    title: "Our Location",
-    lines: ["East Africa Operations Hub", "Serving families & organizations globally"],
-    color: "text-primary",
-    bg: "bg-primary/10",
-  },
-  {
-    icon: Mail,
-    title: "Email Us",
-    lines: ["hello@adulisfood.com", "sales@adulisfood.com"],
-    color: "text-primary",
-    bg: "bg-primary/10",
-  },
-  {
-    icon: Phone,
-    title: "Call Us",
-    lines: ["+251 (0) 911 000 000", "Mon – Fri, 8am – 6pm EAT"],
-    color: "text-primary",
-    bg: "bg-primary/10",
-  },
-  {
-    icon: Clock,
-    title: "Business Hours",
-    lines: ["Monday – Friday: 8am – 6pm", "Saturday: 9am – 2pm EAT"],
-    color: "text-primary",
-    bg: "bg-primary/10",
-  },
-];
-
-const inquiryTypes = [
-  "General Inquiry",
-  "Product Inquiry",
-  "Wholesale / Partnership",
-  "Humanitarian / NGO",
-  "Careers",
-  "Other",
-];
-
-// Decorative dots pattern component
 function DotsPattern() {
   return (
     <div className="absolute inset-0 z-0 pointer-events-none opacity-20" style={{
@@ -62,26 +22,54 @@ function DotsPattern() {
 }
 
 export default function ContactUs() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const contactMutation = useContact();
   const [isSuccess, setIsSuccess] = useState(false);
+  const inquiryTypes = t("contact.inquiryTypes", { returnObjects: true }) as string[];
   const [activeInquiry, setActiveInquiry] = useState(inquiryTypes[0]);
+
+  useEffect(() => {
+    setActiveInquiry(inquiryTypes[0]);
+  }, [t]);
+
+  const contactInfo = [
+    {
+      icon: MapPin,
+      title: t("contact.ourLocation"),
+      lines: t("contact.locationLines", { returnObjects: true }) as string[],
+      color: "text-primary",
+      bg: "bg-primary/10",
+    },
+    {
+      icon: Mail,
+      title: t("contact.emailUs"),
+      lines: ["hello@adulisfood.com", "sales@adulisfood.com"],
+      color: "text-primary",
+      bg: "bg-primary/10",
+    },
+    {
+      icon: Phone,
+      title: t("contact.callUs"),
+      lines: ["+251 (0) 911 000 000", t("contact.callHours")],
+      color: "text-primary",
+      bg: "bg-primary/10",
+    },
+    {
+      icon: Clock,
+      title: t("contact.businessHours"),
+      lines: t("contact.businessHoursLines", { returnObjects: true }) as string[],
+      color: "text-primary",
+      bg: "bg-primary/10",
+    },
+  ];
 
   const form = useForm<ContactInput>({
     resolver: zodResolver(contactSchema),
     defaultValues: { name: "", email: "", message: "" },
   });
 
-  // Automatically prepend inquiry type to message if it changes
-  useEffect(() => {
-    const currentMessage = form.getValues("message");
-    // Just a nice UX touch - but we don't strictly need to modify the message field.
-    // Instead we can pass it along with the payload, but since the schema only takes name/email/message,
-    // we'll just leave this as a visual selection for now.
-  }, [activeInquiry, form]);
-
   function onSubmit(data: ContactInput) {
-    // Prefix message with inquiry type
     const payload = {
       ...data,
       message: `[Inquiry Type: ${activeInquiry}]\n\n${data.message}`
@@ -90,7 +78,6 @@ export default function ContactUs() {
     contactMutation.mutate(payload, {
       onSuccess: () => {
         setIsSuccess(true);
-        // Reset success state after 5 seconds
         setTimeout(() => {
           setIsSuccess(false);
           form.reset();
@@ -99,8 +86,8 @@ export default function ContactUs() {
       onError: () => {
         toast({
           variant: "destructive",
-          title: "Failed to Send",
-          description: "Something went wrong. Please try again later.",
+          title: t("contact.failedTitle"),
+          description: t("contact.failedDesc"),
         });
       },
     });
@@ -132,9 +119,9 @@ export default function ContactUs() {
               transition={{ delay: 0.2 }}
               className="text-primary font-bold tracking-widest uppercase text-sm mb-4 bg-primary/20 inline-block px-4 py-1.5 rounded-full border border-primary/30"
             >
-              Get in Touch
+              {t("contact.badge")}
             </motion.p>
-            <h1 className="text-5xl md:text-7xl font-display font-bold mb-6 drop-shadow-md">Contact Us</h1>
+            <h1 className="text-5xl md:text-7xl font-display font-bold mb-6 drop-shadow-md">{t("contact.heroTitle")}</h1>
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: 96 }}
@@ -142,8 +129,7 @@ export default function ContactUs() {
               className="h-1.5 bg-primary mx-auto mb-8 rounded-full shadow-[0_0_10px_rgba(194,99,33,0.5)]" 
             />
             <p className="text-xl text-white/90 leading-relaxed font-light">
-              We'd love to hear from you. Whether you're a customer, a business partner, 
-              an NGO, or a future team member — reach out to us.
+              {t("contact.heroDesc")}
             </p>
           </motion.div>
         </div>
@@ -162,13 +148,7 @@ export default function ContactUs() {
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
-                  // Directions: left, down, up, right
-                  custom={idx}
-                  variants={{
-                    hidden: { opacity: 0, x: idx === 0 ? -50 : idx === 3 ? 50 : 0, y: idx === 1 ? -50 : idx === 2 ? 50 : 0 },
-                    visible: { opacity: 1, x: 0, y: 0 }
-                  }}
-                  transition={{ duration: 0.6, type: "spring", bounce: 0.4 }}
+                  transition={{ duration: 0.6, type: "spring", bounce: 0.4, delay: idx * 0.1 }}
                 >
                   <Card className="h-full border-0 bg-card hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group rounded-2xl relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-1 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
@@ -191,16 +171,15 @@ export default function ContactUs() {
         </div>
       </section>
 
-      {/* CONTACT FORM + MAP */}
+      {/* CONTACT FORM */}
       <section className="py-24 bg-background relative overflow-hidden">
-        {/* Decorative background shapes */}
         <div className="absolute top-40 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -z-10" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary/5 rounded-full blur-3xl -z-10" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
 
-            {/* Left - Context */}
+            {/* Left */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -208,25 +187,20 @@ export default function ContactUs() {
               transition={{ duration: 0.8 }}
             >
               <p className="text-primary font-medium tracking-widest uppercase text-sm mb-4">
-                Send a Message
+                {t("contact.sendMessage")}
               </p>
-              <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-6 leading-tight">
-                We'd Love to<br />Hear From You
+              <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-6 leading-tight"
+                style={{ whiteSpace: "pre-line" }}>
+                {t("contact.lovedToHear")}
               </h2>
               <div className="w-24 h-1.5 bg-primary mb-8 rounded-full" />
               <div className="space-y-4 text-muted-foreground leading-relaxed text-lg">
-                <p>
-                  Whether you have a question about our products, want to discuss a wholesale
-                  partnership, need humanitarian supply information, or are interested in joining
-                  our team — we're here to help.
-                </p>
-                <p>
-                  Fill out the form and one of our team members will respond within 24 business hours.
-                </p>
+                <p>{t("contact.formDesc1")}</p>
+                <p>{t("contact.formDesc2")}</p>
               </div>
 
               <div className="mt-10">
-                <h4 className="font-display font-bold text-foreground mb-4 text-xl">Type of Inquiry</h4>
+                <h4 className="font-display font-bold text-foreground mb-4 text-xl">{t("contact.inquiryType")}</h4>
                 <div className="flex flex-wrap gap-3">
                   {inquiryTypes.map((type) => (
                     <button
@@ -245,7 +219,6 @@ export default function ContactUs() {
                 </div>
               </div>
 
-              {/* Decorative image */}
               <div className="mt-12 rounded-3xl overflow-hidden shadow-2xl relative group">
                 <div className="absolute inset-0 bg-primary/20 mix-blend-overlay z-10 group-hover:opacity-0 transition-opacity duration-500" />
                 <img
@@ -265,7 +238,6 @@ export default function ContactUs() {
             >
               <Card className="border-0 shadow-2xl bg-card rounded-[2rem] overflow-hidden relative">
                 
-                {/* Success Overlay */}
                 <AnimatePresence>
                   {isSuccess && (
                     <motion.div 
@@ -287,7 +259,7 @@ export default function ContactUs() {
                         transition={{ delay: 0.3 }}
                         className="text-3xl font-display font-bold text-foreground mb-3"
                       >
-                        Message Sent!
+                        {t("contact.successTitle")}
                       </motion.h3>
                       <motion.p 
                         initial={{ opacity: 0, y: 10 }}
@@ -295,28 +267,20 @@ export default function ContactUs() {
                         transition={{ delay: 0.4 }}
                         className="text-muted-foreground text-lg"
                       >
-                        Thank you for reaching out. We'll get back to you within 24 hours.
+                        {t("contact.successDesc")}
                       </motion.p>
-                      
-                      {/* Confetti effect particles */}
                       {[...Array(20)].map((_, i) => (
                         <motion.div
                           key={i}
                           className="absolute w-2 h-2 rounded-full bg-primary"
-                          initial={{ 
-                            x: 0, y: 0, opacity: 1, scale: 0 
-                          }}
+                          initial={{ x: 0, y: 0, opacity: 1, scale: 0 }}
                           animate={{ 
                             x: (Math.random() - 0.5) * 400, 
                             y: (Math.random() - 0.5) * 400, 
                             opacity: 0,
                             scale: Math.random() * 2 + 1
                           }}
-                          transition={{ 
-                            duration: 1 + Math.random(), 
-                            ease: "easeOut",
-                            delay: 0.1
-                          }}
+                          transition={{ duration: 1 + Math.random(), ease: "easeOut", delay: 0.1 }}
                         />
                       ))}
                     </motion.div>
@@ -324,7 +288,7 @@ export default function ContactUs() {
                 </AnimatePresence>
 
                 <CardContent className="p-8 md:p-12 relative z-10">
-                  <h3 className="text-3xl font-display font-bold text-foreground mb-8">Send Us a Message</h3>
+                  <h3 className="text-3xl font-display font-bold text-foreground mb-8">{t("contact.sendMessage")}</h3>
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-7">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -333,11 +297,11 @@ export default function ContactUs() {
                           name="name"
                           render={({ field }) => (
                             <FormItem className="sm:col-span-2">
-                              <FormLabel className="text-foreground font-semibold">Full Name</FormLabel>
+                              <FormLabel className="text-foreground font-semibold">{t("contact.fullName")}</FormLabel>
                               <FormControl>
                                 <div className="relative group">
                                   <Input
-                                    placeholder="Your full name"
+                                    placeholder={t("contact.namePlaceholder")}
                                     {...field}
                                     className="h-14 bg-muted/50 border-transparent focus-visible:ring-0 focus-visible:border-primary/50 transition-all rounded-xl px-5 text-base peer"
                                   />
@@ -353,12 +317,12 @@ export default function ContactUs() {
                           name="email"
                           render={({ field }) => (
                             <FormItem className="sm:col-span-2">
-                              <FormLabel className="text-foreground font-semibold">Email Address</FormLabel>
+                              <FormLabel className="text-foreground font-semibold">{t("contact.emailAddress")}</FormLabel>
                               <FormControl>
                                 <div className="relative">
                                   <Input
                                     type="email"
-                                    placeholder="you@example.com"
+                                    placeholder={t("contact.emailPlaceholder")}
                                     {...field}
                                     className="h-14 bg-muted/50 border-transparent focus-visible:ring-0 focus-visible:border-primary/50 transition-all rounded-xl px-5 text-base peer"
                                   />
@@ -375,11 +339,11 @@ export default function ContactUs() {
                         name="message"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-foreground font-semibold">Your Message</FormLabel>
+                            <FormLabel className="text-foreground font-semibold">{t("contact.yourMessage")}</FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Textarea
-                                  placeholder="How can we help you today?"
+                                  placeholder={t("contact.messagePlaceholder")}
                                   className="min-h-[180px] resize-y bg-muted/50 border-transparent focus-visible:ring-0 focus-visible:border-primary/50 transition-all rounded-xl p-5 text-base peer"
                                   {...field}
                                 />
@@ -400,19 +364,19 @@ export default function ContactUs() {
                           {contactMutation.isPending ? (
                             <>
                               <Loader2 className="mr-3 h-6 w-6 animate-spin" />
-                              Sending your message...
+                              {t("contact.sending")}
                             </>
                           ) : (
                             <>
                               <Send className="mr-3 h-6 w-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                              Send Message
+                              {t("contact.send")}
                             </>
                           )}
                         </span>
                         <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
                       </Button>
                       <p className="text-muted-foreground text-sm text-center font-medium">
-                        We respect your privacy. Your information will never be shared.
+                        {t("contact.privacy")}
                       </p>
                     </form>
                   </Form>

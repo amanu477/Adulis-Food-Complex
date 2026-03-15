@@ -9,22 +9,12 @@ import { useListProducts, useAddToCart, getGetCartQueryKey } from "@workspace/ap
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
-const CATEGORIES = ["All", "Snacks", "Spreads", "Nuts"];
-
-const PRODUCT_FEATURES: Record<string, string[]> = {
-  "Kolo": ["100% Natural Barley", "No Artificial Flavors", "Rich in Fiber", "Traditional Recipe"],
-  "Dabo Kolo": ["Baked Not Fried", "Traditional Spices", "Perfect for Sharing", "Long Shelf Life"],
-  "Peanut Butter": ["No Palm Oil", "High Protein", "No Preservatives", "Freshly Ground"],
-  "Roasted Peanuts": ["Premium Crop Selection", "In-House Roasted", "High Protein", "Resealable Packaging"],
-};
-
-function getFeatures(name: string): string[] {
-  const key = Object.keys(PRODUCT_FEATURES).find(k => name.includes(k));
-  return key ? PRODUCT_FEATURES[key] : ["Premium Quality", "Natural Ingredients", "Ethiopian Tradition", "Family Approved"];
-}
+const CATEGORY_KEYS = ["All", "Snacks", "Spreads", "Nuts"];
 
 export default function Products() {
+  const { t } = useTranslation();
   const [activeCategory, setActiveCategory] = useState("All");
   const [addingId, setAddingId] = useState<number | null>(null);
   const { data: products = [], isLoading } = useListProducts();
@@ -54,7 +44,22 @@ export default function Products() {
     );
   };
 
-  const titleText = "Our Products";
+  const getCategoryLabel = (cat: string) => cat === "All" ? t("products.all") : cat;
+
+  const getFeatures = (name: string): string[] => {
+    if (name.includes("Kolo") && !name.includes("Dabo")) return t("products.features.kolo", { returnObjects: true }) as string[];
+    if (name.includes("Dabo")) return t("products.features.daboKolo", { returnObjects: true }) as string[];
+    if (name.includes("Peanut Butter")) return t("products.features.peanutButter", { returnObjects: true }) as string[];
+    if (name.includes("Peanut")) return t("products.features.roastedPeanuts", { returnObjects: true }) as string[];
+    return t("products.features.default", { returnObjects: true }) as string[];
+  };
+
+  const trustBadges = [
+    { icon: ShieldCheck, text: t("products.qualityCertified"), color: "text-blue-500" },
+    { icon: Leaf, text: t("products.sustainablySourced"), color: "text-secondary" },
+    { icon: Star, text: t("products.fiveStarRated"), color: "text-amber-500", fill: true },
+    { icon: Info, text: t("products.naturalIngredients"), color: "text-primary" },
+  ];
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -76,10 +81,10 @@ export default function Products() {
               transition={{ delay: 0.2 }}
               className="text-primary font-bold tracking-widest uppercase text-sm mb-4 bg-primary/20 inline-block px-4 py-1.5 rounded-full border border-primary/30"
             >
-              Our Range
+              {t("products.badge")}
             </motion.p>
             <h1 className="text-5xl md:text-7xl font-display font-bold mb-6 flex justify-center gap-[0.2em] overflow-hidden">
-              {titleText.split("").map((char, i) => (
+              {t("products.title").split("").map((char, i) => (
                 <motion.span
                   key={i}
                   initial={{ opacity: 0, y: 50 }}
@@ -103,8 +108,7 @@ export default function Products() {
               transition={{ delay: 1.2, duration: 1 }}
               className="text-xl text-white/80 max-w-2xl mx-auto leading-relaxed font-light"
             >
-              Crafted with care, purity, and the authentic taste your family loves.
-              Discover our full range of premium Ethiopian food products.
+              {t("products.desc")}
             </motion.p>
           </motion.div>
         </div>
@@ -120,12 +124,7 @@ export default function Products() {
             variants={{ visible: { transition: { staggerChildren: 0.1 } }, hidden: {} }}
             className="flex flex-wrap justify-center gap-8 md:gap-20 text-sm font-medium text-foreground/80"
           >
-            {[
-              { icon: ShieldCheck, text: "Quality Certified", color: "text-blue-500" },
-              { icon: Leaf, text: "Sustainably Sourced", color: "text-secondary" },
-              { icon: Star, text: "5-Star Rated Products", color: "text-amber-500", fill: true },
-              { icon: Info, text: "100% Natural Ingredients", color: "text-primary" },
-            ].map((badge, i) => (
+            {trustBadges.map((badge, i) => (
               <motion.div
                 key={i}
                 variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
@@ -146,7 +145,7 @@ export default function Products() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Category filter */}
           <div className="flex flex-wrap gap-4 mb-16 justify-center">
-            {CATEGORIES.filter(c => c === "All" || products.some(p => p.category === c)).map((cat) => (
+            {CATEGORY_KEYS.filter(c => c === "All" || products.some(p => p.category === c)).map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
@@ -161,7 +160,7 @@ export default function Products() {
                     transition={{ type: "spring", stiffness: 300, damping: 25 }}
                   />
                 )}
-                <span className="relative z-10">{cat}</span>
+                <span className="relative z-10">{getCategoryLabel(cat)}</span>
               </button>
             ))}
           </div>
@@ -245,7 +244,9 @@ export default function Products() {
                               <div>
                                 <span className="text-3xl font-bold text-primary">${Number(product.price).toFixed(2)}</span>
                                 <p className="text-xs text-muted-foreground mt-0.5">
-                                  {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
+                                  {product.stock > 0
+                                    ? t("products.inStock", { count: product.stock })
+                                    : t("products.outOfStock")}
                                 </p>
                               </div>
                               <button
@@ -254,12 +255,16 @@ export default function Products() {
                                 className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/25 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30 duration-200"
                               >
                                 <ShoppingCart className="h-4 w-4" />
-                                {addingId === product.id ? "Adding…" : product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+                                {addingId === product.id
+                                  ? t("products.adding")
+                                  : product.stock === 0
+                                  ? t("products.outOfStock")
+                                  : t("products.addToCart")}
                               </button>
                               {!user && (
                                 <Link href="/login">
                                   <span className="text-sm text-muted-foreground hover:text-primary transition cursor-pointer">
-                                    Sign in to order
+                                    {t("products.signInToOrder")}
                                   </span>
                                 </Link>
                               )}
@@ -273,7 +278,7 @@ export default function Products() {
               </AnimatePresence>
               {filtered.length === 0 && !isLoading && (
                 <div className="text-center py-20">
-                  <p className="text-muted-foreground text-xl">No products found in this category.</p>
+                  <p className="text-muted-foreground text-xl">{t("products.noProducts")}</p>
                 </div>
               )}
             </div>
@@ -299,15 +304,14 @@ export default function Products() {
               <Leaf strokeWidth={1.5} className="w-10 h-10" />
             </motion.div>
             <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-6">
-              Creating the Region's Essential Nutrition
+              {t("products.essentialNutrition")}
             </h2>
             <p className="text-muted-foreground text-xl leading-relaxed mb-10">
-              We provide fortified baby food, baking ingredients, snacks, and specialized relief products
-              to humanitarian organizations, bakeries, retailers, and families across East Africa.
+              {t("products.essentialDesc")}
             </p>
             <Link href="/contact">
               <Button size="lg" variant="outline" className="rounded-full px-10 py-6 text-lg border-2 border-secondary text-secondary hover:bg-secondary hover:text-white transition-all hover:shadow-[0_0_20px_rgba(44,104,66,0.3)]">
-                Partner With Us <ArrowRight className="ml-2 w-5 h-5" />
+                {t("products.partnerWithUs")} <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
           </motion.div>

@@ -1,7 +1,14 @@
 import { Link } from "wouter";
 import { Mail, MapPin, Phone } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export function Footer() {
+  const { t, i18n } = useTranslation();
+
+  const toggleLanguage = () => {
+    i18n.changeLanguage(i18n.language === "en" ? "am" : "en");
+  };
+
   return (
     <footer className="bg-foreground text-background pt-16 pb-8 border-t-4 border-primary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -13,43 +20,52 @@ export function Footer() {
               className="h-16 w-auto brightness-0 invert"
             />
             <p className="text-background/70 max-w-sm leading-relaxed text-sm">
-              We are dedicated to bringing the heart of Ethiopian tradition to your table.
-              Authentic, hygienic, and delicious products that honor our culinary heritage.
+              {t("footer.tagline")}
             </p>
             <div className="flex items-center gap-3 text-sm font-medium text-background/50">
-              <span className="text-primary cursor-pointer hover:text-white transition-colors">English</span>
+              <button
+                onClick={toggleLanguage}
+                className={`cursor-pointer hover:text-white transition-colors ${i18n.language === "en" ? "text-primary" : "text-background/50"}`}
+              >
+                English
+              </button>
               <span>|</span>
-              <span className="cursor-pointer hover:text-white transition-colors">አማርኛ</span>
+              <button
+                onClick={toggleLanguage}
+                className={`cursor-pointer hover:text-white transition-colors ${i18n.language === "am" ? "text-primary" : "text-background/50"}`}
+              >
+                አማርኛ
+              </button>
             </div>
           </div>
 
           <div>
-            <h4 className="font-display font-bold text-lg mb-5 text-white">Quick Links</h4>
+            <h4 className="font-display font-bold text-lg mb-5 text-white">{t("footer.quickLinks")}</h4>
             <ul className="space-y-3 text-background/70 text-sm">
               <li>
-                <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+                <Link href="/" className="hover:text-primary transition-colors">{t("footer.links.home")}</Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-primary transition-colors">About Us</Link>
+                <Link href="/about" className="hover:text-primary transition-colors">{t("footer.links.about")}</Link>
               </li>
               <li>
-                <Link href="/products" className="hover:text-primary transition-colors">Products</Link>
+                <Link href="/products" className="hover:text-primary transition-colors">{t("footer.links.products")}</Link>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-primary transition-colors">Contact Us</Link>
+                <Link href="/contact" className="hover:text-primary transition-colors">{t("footer.links.contact")}</Link>
               </li>
               <li>
-                <a href="#" className="hover:text-primary transition-colors">Sitemap</a>
+                <a href="#" className="hover:text-primary transition-colors">{t("footer.sitemap")}</a>
               </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-display font-bold text-lg mb-5 text-white">Contact</h4>
+            <h4 className="font-display font-bold text-lg mb-5 text-white">{t("footer.contact")}</h4>
             <ul className="space-y-4 text-background/70 text-sm">
               <li className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                <span>East Africa Operations Hub<br />Serving families globally</span>
+                <span style={{ whiteSpace: "pre-line" }}>{t("footer.location")}</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-primary shrink-0" />
@@ -66,12 +82,10 @@ export function Footer() {
         </div>
 
         <div className="pt-8 border-t border-background/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-background/40 text-sm">
-            &copy; 2026 Adulis Food Complex. All rights reserved.
-          </p>
+          <p className="text-background/40 text-sm">{t("footer.copyright")}</p>
           <div className="flex gap-6 text-background/40 text-sm">
-            <a href="#" className="hover:text-primary transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-primary transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-primary transition-colors">{t("footer.terms")}</a>
+            <a href="#" className="hover:text-primary transition-colors">{t("footer.privacy")}</a>
           </div>
         </div>
       </div>

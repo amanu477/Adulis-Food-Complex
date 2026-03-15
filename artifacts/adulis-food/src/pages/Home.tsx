@@ -4,58 +4,7 @@ import { Link } from "wouter";
 import { ArrowRight, Star, ChevronRight, ArrowUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-
-const featuredProducts = [
-  {
-    name: "Adulis Kolo",
-    image: "https://superboostup.com/AdulisFarm/wp-content/uploads/2026/02/Kolo-300x300.png",
-    desc: "Authentic Ethiopian roasted barley snack. Perfect for coffee time.",
-    badge: "Best Seller",
-  },
-  {
-    name: "Adulis Dabo Kolo",
-    image: "https://superboostup.com/AdulisFarm/wp-content/uploads/2026/02/Dabo-Kolo-300x300.png",
-    desc: "Ethiopian baked bread bites, perfect for a satisfying treat at any time of day.",
-    badge: "Fan Favorite",
-  },
-  {
-    name: "Adulis Peanut Butter",
-    image: "https://superboostup.com/AdulisFarm/wp-content/uploads/2026/02/Peanut-Butter-300x300.png",
-    desc: "Premium creamy peanut butter made from freshly roasted peanuts.",
-    badge: "New",
-  },
-  {
-    name: "Adulis Roasted Peanuts",
-    image: "https://superboostup.com/AdulisFarm/wp-content/uploads/2026/02/Roasted-Peanut-300x300.png",
-    desc: "Freshly roasted crunchy peanuts. A healthy and delicious protein snack.",
-    badge: "Popular",
-  },
-];
-
-const testimonials = [
-  {
-    text: "As someone who lives abroad, finding the true taste of home is rare. The Beso and Shiro from Adulis Food Complex are game-changers. The packaging is world-class, but the flavor is exactly like my grandmother's kitchen in Addis.",
-    author: "Selamawit T.",
-    role: "Customer from Diaspora",
-  },
-  {
-    text: "The quality of the Roasted Peanuts and Dabo Kolo is unmatched. You can tell they use premium ingredients — no dust, just perfectly roasted, crunchy perfection. It's my go-to snack for the office.",
-    author: "Dawit M.",
-    role: "Office Professional",
-  },
-  {
-    text: "We use Adulis spices in our restaurant, and the feedback has been incredible. The 'export-quality' label isn't just marketing; you can see and smell the difference immediately.",
-    author: "Tigist B.",
-    role: "Restaurant Owner",
-  },
-];
-
-const stats = [
-  { value: 10, suffix: "+", label: "Years of Excellence" },
-  { value: 50, suffix: "K+", label: "Families Served" },
-  { value: 20, suffix: "+", label: "Premium Products" },
-  { value: 15, suffix: "+", label: "Countries Reached" },
-];
+import { useTranslation } from "react-i18next";
 
 function CountUpNumber({ value, suffix }: { value: number; suffix: string }) {
   const [count, setCount] = useState(0);
@@ -86,6 +35,7 @@ function CountUpNumber({ value, suffix }: { value: number; suffix: string }) {
 }
 
 export default function Home() {
+  const { t } = useTranslation();
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 1000], [0, 300]);
   const opacityHero = useTransform(scrollY, [0, 600], [1, 0]);
@@ -97,6 +47,58 @@ export default function Home() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const featuredProducts = [
+    {
+      name: t("home.products.kolo.name"),
+      image: "https://superboostup.com/AdulisFarm/wp-content/uploads/2026/02/Kolo-300x300.png",
+      desc: t("home.products.kolo.desc"),
+      badge: t("home.products.kolo.badge"),
+    },
+    {
+      name: t("home.products.daboKolo.name"),
+      image: "https://superboostup.com/AdulisFarm/wp-content/uploads/2026/02/Dabo-Kolo-300x300.png",
+      desc: t("home.products.daboKolo.desc"),
+      badge: t("home.products.daboKolo.badge"),
+    },
+    {
+      name: t("home.products.peanutButter.name"),
+      image: "https://superboostup.com/AdulisFarm/wp-content/uploads/2026/02/Peanut-Butter-300x300.png",
+      desc: t("home.products.peanutButter.desc"),
+      badge: t("home.products.peanutButter.badge"),
+    },
+    {
+      name: t("home.products.roastedPeanuts.name"),
+      image: "https://superboostup.com/AdulisFarm/wp-content/uploads/2026/02/Roasted-Peanut-300x300.png",
+      desc: t("home.products.roastedPeanuts.desc"),
+      badge: t("home.products.roastedPeanuts.badge"),
+    },
+  ];
+
+  const testimonials = [
+    {
+      text: "As someone who lives abroad, finding the true taste of home is rare. The Beso and Shiro from Adulis Food Complex are game-changers. The packaging is world-class, but the flavor is exactly like my grandmother's kitchen in Addis.",
+      author: "Selamawit T.",
+      role: "Customer from Diaspora",
+    },
+    {
+      text: "The quality of the Roasted Peanuts and Dabo Kolo is unmatched. You can tell they use premium ingredients — no dust, just perfectly roasted, crunchy perfection. It's my go-to snack for the office.",
+      author: "Dawit M.",
+      role: "Office Professional",
+    },
+    {
+      text: "We use Adulis spices in our restaurant, and the feedback has been incredible. The 'export-quality' label isn't just marketing; you can see and smell the difference immediately.",
+      author: "Tigist B.",
+      role: "Restaurant Owner",
+    },
+  ];
+
+  const stats = [
+    { value: 10, suffix: "+", label: t("home.statsYears") },
+    { value: 50, suffix: "K+", label: t("home.statsFamilies") },
+    { value: 20, suffix: "+", label: t("home.statsProducts") },
+    { value: 15, suffix: "+", label: t("home.statsCountries") },
+  ];
 
   const titleAmharic = "አዱሊስ";
 
@@ -128,7 +130,6 @@ export default function Home() {
           <div className="absolute inset-0 bg-grain" />
         </motion.div>
 
-        {/* Floating particles */}
         {[...Array(15)].map((_, i) => (
           <motion.div
             key={i}
@@ -157,7 +158,7 @@ export default function Home() {
               transition={{ delay: 0.3, duration: 0.6 }}
               className="text-primary font-medium tracking-widest uppercase text-sm mb-4"
             >
-              Premium Ethiopian Food Products
+              {t("home.heroBadge")}
             </motion.p>
             
             <h1 className="font-display text-6xl md:text-8xl font-bold tracking-wide mb-4 text-amber-400 drop-shadow-2xl leading-none flex gap-1">
@@ -173,8 +174,9 @@ export default function Home() {
               ))}
             </h1>
             
-            <h2 className="text-3xl md:text-4xl font-display font-semibold mb-6 leading-tight shimmer-text">
-              Nourishing Families,<br />One Meal at a Time.
+            <h2 className="text-3xl md:text-4xl font-display font-semibold mb-6 leading-tight shimmer-text"
+              style={{ whiteSpace: "pre-line" }}>
+              {t("home.heroSubtitle")}
             </h2>
             
             <motion.p
@@ -183,8 +185,7 @@ export default function Home() {
               transition={{ delay: 0.9, duration: 0.6 }}
               className="text-lg text-white/80 mb-10 leading-relaxed max-w-xl"
             >
-              From the heart of our complex to your kitchen table. We produce premium quality food
-              products crafted with care, purity, and the authentic taste your family loves.
+              {t("home.heroDesc")}
             </motion.p>
             
             <motion.div
@@ -199,7 +200,7 @@ export default function Home() {
                   className="text-base px-8 py-6 rounded-full shadow-[0_0_25px_rgba(194,99,33,0.5)] hover:shadow-[0_0_45px_rgba(194,99,33,0.8)] transition-all hover:-translate-y-1 relative overflow-hidden group"
                 >
                   <span className="relative z-10 flex items-center">
-                    Explore Our Products
+                    {t("home.exploreProducts")}
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </span>
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
@@ -211,21 +212,20 @@ export default function Home() {
                   variant="outline"
                   className="text-base px-8 py-6 rounded-full border-white/40 text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all hover:-translate-y-1"
                 >
-                  Our Story
+                  {t("home.ourStory")}
                 </Button>
               </Link>
             </motion.div>
           </motion.div>
         </div>
 
-        {/* Scroll indicator */}
         <motion.div
           className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/50"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5 }}
         >
-          <span className="text-xs tracking-widest uppercase">Scroll</span>
+          <span className="text-xs tracking-widest uppercase">{t("home.scroll")}</span>
           <motion.div
             animate={{ y: [0, 8, 0], opacity: [0.5, 1, 0.5] }}
             transition={{ repeat: Infinity, duration: 1.5 }}
@@ -271,10 +271,10 @@ export default function Home() {
             className="text-center max-w-3xl mx-auto mb-16"
           >
             <p className="text-primary font-medium tracking-widest uppercase text-sm mb-3">
-              What We Offer
+              {t("home.whatWeOffer")}
             </p>
             <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-5 relative inline-block">
-              Our Popular Products
+              {t("home.popularProducts")}
               <motion.div
                 className="absolute -bottom-2 left-0 h-1 bg-primary/30 w-full rounded-full"
                 initial={{ scaleX: 0 }}
@@ -284,8 +284,7 @@ export default function Home() {
               />
             </h2>
             <p className="text-muted-foreground text-lg leading-relaxed mt-4">
-              Discover the favorites that have found a home in kitchens across East Africa.
-              Crafted with care to nourish your family.
+              {t("home.popularDesc")}
             </p>
           </motion.div>
 
@@ -339,7 +338,7 @@ export default function Home() {
           >
             <Link href="/products">
               <Button variant="outline" size="lg" className="rounded-full border-primary/50 text-primary hover:bg-primary hover:text-white transition-all px-8 group shadow-sm hover:shadow-lg">
-                View All Products
+                {t("home.viewAll")}
                 <ChevronRight className="ml-1 w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
@@ -382,11 +381,11 @@ export default function Home() {
                 transition={{ delay: 0.4 }}
                 className="text-primary font-medium tracking-widest uppercase text-sm"
               >
-                Our Heritage
+                {t("home.ourHeritage")}
               </motion.p>
               
               <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground leading-tight">
-                A Taste of Home
+                {t("home.tasteOfHome")}
               </h2>
               
               <motion.div 
@@ -397,13 +396,10 @@ export default function Home() {
               />
               
               <p className="text-lg text-muted-foreground leading-relaxed">
-                We bridge the gap between modern convenience and traditional taste. Our products are crafted
-                to deliver the distinct, earthy flavors of Ethiopia, offering you the comfort of homemade
-                snacks without the time-consuming preparation.
+                {t("home.tasteDesc1")}
               </p>
               <p className="text-muted-foreground leading-relaxed">
-                Every product we make is a tribute to the rich culinary traditions passed down through
-                generations — now available to families and communities around the world.
+                {t("home.tasteDesc2")}
               </p>
               
               <motion.div
@@ -413,7 +409,7 @@ export default function Home() {
                 <Link href="/about">
                   <Button variant="ghost" className="rounded-full mt-2 text-primary hover:bg-primary/10 hover:text-primary transition-all p-0 group">
                     <span className="border-b border-primary/30 pb-0.5 group-hover:border-primary transition-colors font-semibold">
-                      Learn Our Story
+                      {t("home.learnOurStory")}
                     </span>
                     <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-2 transition-transform" />
                   </Button>
@@ -434,13 +430,13 @@ export default function Home() {
             className="text-center mb-16"
           >
             <p className="text-primary font-medium tracking-widest uppercase text-sm mb-3">
-              Testimonials
+              {t("home.testimonials")}
             </p>
             <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-4">
-              What Our Customers Say
+              {t("home.whatCustomersSay")}
             </h2>
             <p className="text-muted-foreground text-lg">
-              Trusted by families, businesses, and organizations worldwide.
+              {t("home.trustedBy")}
             </p>
           </motion.div>
 
@@ -457,7 +453,7 @@ export default function Home() {
                 },
               }}
             >
-              {[...testimonials, ...testimonials, ...testimonials].map((t, idx) => (
+              {[...testimonials, ...testimonials, ...testimonials].map((t_item, idx) => (
                 <div key={idx} className="w-[350px] shrink-0">
                   <Card className="h-full bg-muted/10 border-border/40 hover:border-primary/30 transition-all hover:shadow-[0_10px_30px_rgba(194,99,33,0.1)] hover:-translate-y-2 duration-300">
                     <CardContent className="p-8 flex flex-col h-full relative">
@@ -468,11 +464,11 @@ export default function Home() {
                         ))}
                       </div>
                       <p className="text-foreground/80 italic leading-relaxed flex-grow text-sm relative z-10">
-                        "{t.text}"
+                        "{t_item.text}"
                       </p>
                       <div className="mt-8 pt-5 border-t border-border/50">
-                        <p className="font-display font-bold text-foreground text-lg">{t.author}</p>
-                        <p className="text-primary text-xs font-medium uppercase tracking-wider mt-1">{t.role}</p>
+                        <p className="font-display font-bold text-foreground text-lg">{t_item.author}</p>
+                        <p className="text-primary text-xs font-medium uppercase tracking-wider mt-1">{t_item.role}</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -480,7 +476,6 @@ export default function Home() {
               ))}
             </motion.div>
             
-            {/* Fade gradients for edges */}
             <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
             <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
           </div>
@@ -513,7 +508,7 @@ export default function Home() {
             transition={{ duration: 0.8 }}
           >
             <h2 className="text-4xl md:text-6xl font-display font-bold mb-6 drop-shadow-lg">
-              Come do good with us
+              {t("home.careersTitle")}
             </h2>
             <motion.div 
               initial={{ width: 0 }}
@@ -522,16 +517,14 @@ export default function Home() {
               className="h-1.5 bg-primary mx-auto mb-8 rounded-full shadow-[0_0_10px_rgba(194,99,33,0.8)]" 
             />
             <p className="text-white/90 text-xl leading-relaxed mb-12 font-medium">
-              For many of us, Adulis is more than just a job. It's a place we feel excited to
-              come each day because we're part of a family doing good in the world.
-              Ready to be part of something meaningful?
+              {t("home.careersDesc")}
             </p>
             <Link href="/contact">
               <Button
                 size="lg"
                 className="text-lg px-10 py-7 rounded-full bg-white text-secondary font-bold hover:bg-primary hover:text-white transition-all animate-pulse-glow hover:scale-105"
               >
-                Join Our Team
+                {t("home.getInTouch")}
                 <ArrowRight className="ml-2 w-6 h-6" />
               </Button>
             </Link>
@@ -539,19 +532,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Floating Scroll to Top */}
+      {/* Scroll-to-top */}
       <AnimatePresence>
         {showScrollTop && (
           <motion.button
-            initial={{ opacity: 0, y: 20, scale: 0.8 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.8 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="fixed bottom-8 right-8 z-50 p-4 rounded-full bg-primary text-white shadow-xl hover:shadow-2xl hover:bg-primary/90 transition-all border-2 border-white/20"
+            className="fixed bottom-8 right-8 z-40 w-12 h-12 bg-primary text-white rounded-full shadow-lg shadow-primary/30 flex items-center justify-center hover:bg-primary/90 hover:-translate-y-1 transition-all duration-200"
           >
-            <ArrowUp className="w-6 h-6" />
+            <ArrowUp className="w-5 h-5" />
           </motion.button>
         )}
       </AnimatePresence>

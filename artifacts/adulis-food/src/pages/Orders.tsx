@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Package, ChevronRight } from "lucide-react";
 import { useListMyOrders, getListMyOrdersQueryKey } from "@workspace/api-client-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTranslation } from "react-i18next";
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-700",
@@ -13,6 +14,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function Orders() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { data: orders = [], isLoading } = useListMyOrders({
     query: { queryKey: getListMyOrdersQueryKey(), enabled: !!user },
@@ -21,9 +23,9 @@ export default function Orders() {
   if (!user) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
-        <p className="text-muted-foreground mb-4">Please sign in to view your orders.</p>
+        <p className="text-muted-foreground mb-4">{t("orders.signInPrompt")}</p>
         <Link href="/login">
-          <button className="bg-primary text-white px-8 py-3 rounded-xl font-semibold">Sign In</button>
+          <button className="bg-primary text-white px-8 py-3 rounded-xl font-semibold">{t("orders.signIn")}</button>
         </Link>
       </div>
     );
@@ -37,19 +39,19 @@ export default function Orders() {
           animate={{ opacity: 1, y: 0 }}
           className="text-4xl font-display font-bold mb-8"
         >
-          My Orders
+          {t("orders.title")}
         </motion.h1>
 
         {isLoading ? (
-          <div className="text-center py-20 text-muted-foreground">Loading…</div>
+          <div className="text-center py-20 text-muted-foreground">{t("orders.loading")}</div>
         ) : orders.length === 0 ? (
           <div className="text-center py-20">
             <Package className="h-16 w-16 text-primary/30 mx-auto mb-4" />
-            <h2 className="text-2xl font-display font-bold mb-2">No orders yet</h2>
-            <p className="text-muted-foreground mb-6">Start shopping and your orders will appear here.</p>
+            <h2 className="text-2xl font-display font-bold mb-2">{t("orders.noOrders")}</h2>
+            <p className="text-muted-foreground mb-6">{t("orders.noOrdersDesc")}</p>
             <Link href="/shop">
               <button className="bg-primary text-white px-8 py-3 rounded-xl font-semibold hover:bg-primary/90 transition">
-                Shop Now
+                {t("orders.shopNow")}
               </button>
             </Link>
           </div>
@@ -65,7 +67,7 @@ export default function Orders() {
               >
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <span className="text-sm text-muted-foreground">Order #{order.id}</span>
+                    <span className="text-sm text-muted-foreground">{t("orders.orderNum", { id: order.id })}</span>
                     <p className="text-xs text-muted-foreground">
                       {new Date(order.createdAt).toLocaleDateString("en-US", {
                         year: "numeric",

@@ -7,10 +7,12 @@ import { getGetCartQueryKey } from "@workspace/api-client-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
-const CATEGORIES = ["All", "Snacks", "Spreads", "Nuts"];
+const CATEGORY_KEYS = ["All", "Snacks", "Spreads", "Nuts"];
 
 export default function Shop() {
+  const { t } = useTranslation();
   const [activeCategory, setActiveCategory] = useState("All");
   const [addingId, setAddingId] = useState<number | null>(null);
   const { data: products = [], isLoading } = useListProducts();
@@ -46,6 +48,8 @@ export default function Shop() {
     );
   };
 
+  const getCategoryLabel = (cat: string) => cat === "All" ? t("shop.all") : cat;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50/50 to-background">
       {/* Hero */}
@@ -57,7 +61,7 @@ export default function Shop() {
             animate={{ opacity: 1, y: 0 }}
             className="text-amber-200 text-sm tracking-widest uppercase font-semibold mb-3"
           >
-            Premium Ethiopian Products
+            {t("shop.badge")}
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -65,7 +69,7 @@ export default function Shop() {
             transition={{ delay: 0.1 }}
             className="text-5xl font-display font-bold mb-4"
           >
-            Our Shop
+            {t("shop.title")}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -73,7 +77,7 @@ export default function Shop() {
             transition={{ delay: 0.2 }}
             className="text-white/80 text-lg max-w-xl mx-auto"
           >
-            Hand-crafted Ethiopian snacks and spreads, made with love and tradition.
+            {t("shop.desc")}
           </motion.p>
         </div>
       </div>
@@ -81,7 +85,7 @@ export default function Shop() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Category filter */}
         <div className="flex gap-3 flex-wrap mb-10 justify-center">
-          {CATEGORIES.map((cat) => (
+          {CATEGORY_KEYS.map((cat) => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
@@ -91,7 +95,7 @@ export default function Shop() {
                   : "bg-white text-foreground/70 hover:bg-primary/10 border border-border"
               }`}
             >
-              {cat}
+              {getCategoryLabel(cat)}
             </button>
           ))}
         </div>
@@ -113,7 +117,7 @@ export default function Shop() {
         ) : filtered.length === 0 ? (
           <div className="text-center py-20 text-muted-foreground">
             <Package className="mx-auto mb-4 h-12 w-12 opacity-40" />
-            <p className="text-lg">No products found in this category.</p>
+            <p className="text-lg">{t("shop.noProducts")}</p>
           </div>
         ) : (
           <motion.div
@@ -145,7 +149,7 @@ export default function Shop() {
                   )}
                   {product.stock === 0 && (
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                      <span className="text-white font-bold text-lg">Out of Stock</span>
+                      <span className="text-white font-bold text-lg">{t("shop.outOfStock")}</span>
                     </div>
                   )}
                 </div>
@@ -176,7 +180,7 @@ export default function Shop() {
                       className="flex items-center gap-2 bg-primary text-white px-4 py-2.5 rounded-xl hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold shadow-md shadow-primary/20"
                     >
                       <ShoppingCart className="h-4 w-4" />
-                      {addingId === product.id ? "Adding…" : "Add"}
+                      {addingId === product.id ? t("shop.adding") : t("shop.add")}
                     </button>
                   </div>
                 </div>

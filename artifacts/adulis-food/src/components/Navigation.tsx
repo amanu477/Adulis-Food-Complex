@@ -5,15 +5,10 @@ import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
-
-const navLinks = [
-  { name: "Home", href: "/" },
-  { name: "About Us", href: "/about" },
-  { name: "Products", href: "/products" },
-  { name: "Contact Us", href: "/contact" },
-];
+import { useTranslation } from "react-i18next";
 
 export function Navigation() {
+  const { t, i18n } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [location] = useLocation();
@@ -21,6 +16,17 @@ export function Navigation() {
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
   const { user, isAdmin, logout } = useAuth();
   const { count: cartCount } = useCart();
+
+  const navLinks = [
+    { name: t("nav.home"), href: "/" },
+    { name: t("nav.about"), href: "/about" },
+    { name: t("nav.products"), href: "/products" },
+    { name: t("nav.contact"), href: "/contact" },
+  ];
+
+  const toggleLanguage = () => {
+    i18n.changeLanguage(i18n.language === "en" ? "am" : "en");
+  };
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -55,7 +61,7 @@ export function Navigation() {
                 const isActive = location === link.href;
                 return (
                   <Link
-                    key={link.name}
+                    key={link.href}
                     href={link.href}
                     className={`text-sm font-medium relative group px-1 py-2 ${
                       isActive ? "text-primary" : "text-foreground/70 hover:text-foreground"
@@ -75,6 +81,15 @@ export function Navigation() {
                   </Link>
                 );
               })}
+
+              {/* Language toggle */}
+              <button
+                onClick={toggleLanguage}
+                className="text-xs font-bold px-2.5 py-1.5 rounded-full border border-border/60 text-foreground/70 hover:text-primary hover:border-primary/50 transition-all"
+                title="Switch language"
+              >
+                {i18n.language === "en" ? "አማ" : "EN"}
+              </button>
 
               {/* Cart */}
               <Link href="/cart" className="relative">
@@ -109,20 +124,20 @@ export function Navigation() {
                         {isAdmin && (
                           <Link href="/admin">
                             <button className="w-full flex items-center gap-2 px-4 py-3 text-sm hover:bg-muted transition text-left">
-                              <LayoutDashboard className="h-4 w-4 text-purple-500" /> Admin Panel
+                              <LayoutDashboard className="h-4 w-4 text-purple-500" /> {t("nav.adminPanel")}
                             </button>
                           </Link>
                         )}
                         <Link href="/orders">
                           <button className="w-full flex items-center gap-2 px-4 py-3 text-sm hover:bg-muted transition text-left">
-                            <Package className="h-4 w-4 text-primary" /> My Orders
+                            <Package className="h-4 w-4 text-primary" /> {t("nav.myOrders")}
                           </button>
                         </Link>
                         <button
                           onClick={logout}
                           className="w-full flex items-center gap-2 px-4 py-3 text-sm hover:bg-red-50 text-red-600 transition text-left border-t"
                         >
-                          <LogOut className="h-4 w-4" /> Sign Out
+                          <LogOut className="h-4 w-4" /> {t("nav.signOut")}
                         </button>
                       </motion.div>
                     )}
@@ -132,12 +147,12 @@ export function Navigation() {
                 <div className="flex items-center gap-2">
                   <Link href="/login">
                     <button className="text-sm font-medium px-3 py-2 rounded-full transition-colors text-foreground/70 hover:text-foreground">
-                      Sign In
+                      {t("nav.signIn")}
                     </button>
                   </Link>
                   <Link href="/shop">
                     <Button size="sm" className="rounded-full shadow-[0_4px_14px_rgba(194,99,33,0.3)] hover:shadow-[0_6px_20px_rgba(194,99,33,0.5)] transition-all duration-300 hover:-translate-y-0.5">
-                      Shop Now
+                      {t("nav.shopNow")}
                     </Button>
                   </Link>
                 </div>
@@ -146,6 +161,12 @@ export function Navigation() {
 
             {/* Mobile buttons */}
             <div className="md:hidden flex items-center gap-2">
+              <button
+                onClick={toggleLanguage}
+                className="text-xs font-bold px-2 py-1 rounded-full border border-border/60 text-foreground/70 hover:text-primary transition"
+              >
+                {i18n.language === "en" ? "አማ" : "EN"}
+              </button>
               <Link href="/cart" className="relative">
                 <button className="p-2 rounded-full text-foreground">
                   <ShoppingCart className="h-5 w-5" />
@@ -179,7 +200,7 @@ export function Navigation() {
               <div className="flex flex-col p-4 space-y-1">
                 {navLinks.map((link, i) => (
                   <motion.div
-                    key={link.name}
+                    key={link.href}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05 }}
@@ -200,29 +221,29 @@ export function Navigation() {
                       {isAdmin && (
                         <Link href="/admin">
                           <button className="w-full text-left p-3 rounded-xl text-sm font-medium text-purple-600 hover:bg-purple-50 transition flex items-center gap-2">
-                            <LayoutDashboard className="h-4 w-4" /> Admin Panel
+                            <LayoutDashboard className="h-4 w-4" /> {t("nav.adminPanel")}
                           </button>
                         </Link>
                       )}
                       <Link href="/orders">
                         <button className="w-full text-left p-3 rounded-xl text-sm font-medium hover:bg-muted transition flex items-center gap-2">
-                          <Package className="h-4 w-4 text-primary" /> My Orders
+                          <Package className="h-4 w-4 text-primary" /> {t("nav.myOrders")}
                         </button>
                       </Link>
                       <button
                         onClick={logout}
                         className="w-full text-left p-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition flex items-center gap-2"
                       >
-                        <LogOut className="h-4 w-4" /> Sign Out
+                        <LogOut className="h-4 w-4" /> {t("nav.signOut")}
                       </button>
                     </>
                   ) : (
                     <>
                       <Link href="/login">
-                        <button className="w-full text-left p-3 rounded-xl text-sm font-medium hover:bg-muted transition">Sign In</button>
+                        <button className="w-full text-left p-3 rounded-xl text-sm font-medium hover:bg-muted transition">{t("nav.signIn")}</button>
                       </Link>
                       <Link href="/register">
-                        <Button className="w-full rounded-xl">Create Account</Button>
+                        <Button className="w-full rounded-xl">{t("nav.createAccount")}</Button>
                       </Link>
                     </>
                   )}

@@ -13,8 +13,10 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 export default function Cart() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
@@ -35,11 +37,11 @@ export default function Cart() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-amber-50/50 px-4">
         <ShoppingBag className="h-16 w-16 text-primary/40 mb-4" />
-        <h2 className="text-2xl font-display font-bold mb-2">Your Cart is Empty</h2>
-        <p className="text-muted-foreground mb-6">Please sign in to view your cart.</p>
+        <h2 className="text-2xl font-display font-bold mb-2">{t("cart.empty")}</h2>
+        <p className="text-muted-foreground mb-6">{t("cart.emptySignIn")}</p>
         <Link href="/login">
           <button className="bg-primary text-white px-8 py-3 rounded-xl font-semibold hover:bg-primary/90 transition">
-            Sign In
+            {t("cart.signIn")}
           </button>
         </Link>
       </div>
@@ -64,7 +66,7 @@ export default function Cart() {
 
   const handleCheckout = () => {
     if (!address.trim()) {
-      toast({ title: "Address required", description: "Please enter a shipping address.", variant: "destructive" });
+      toast({ title: t("cart.addressRequired"), description: t("cart.addressRequiredDesc"), variant: "destructive" });
       return;
     }
     setCheckingOut(true);
@@ -73,11 +75,11 @@ export default function Cart() {
       {
         onSuccess: () => {
           invalidateCart();
-          toast({ title: "Order placed!", description: "Your order has been confirmed." });
+          toast({ title: t("cart.orderPlaced"), description: t("cart.orderConfirmed") });
           setLocation("/orders");
         },
         onError: (err: any) => {
-          toast({ title: "Error", description: err?.data?.error ?? "Order failed.", variant: "destructive" });
+          toast({ title: "Error", description: err?.data?.error ?? t("cart.orderFailed"), variant: "destructive" });
         },
         onSettled: () => setCheckingOut(false),
       }
@@ -92,11 +94,11 @@ export default function Cart() {
           animate={{ opacity: 1, y: 0 }}
           className="text-4xl font-display font-bold mb-8"
         >
-          Your Cart
+          {t("cart.title")}
         </motion.h1>
 
         {isLoading ? (
-          <div className="text-center py-20 text-muted-foreground">Loading…</div>
+          <div className="text-center py-20 text-muted-foreground">{t("cart.loading")}</div>
         ) : cartItems.length === 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
@@ -104,11 +106,11 @@ export default function Cart() {
             className="text-center py-20"
           >
             <ShoppingBag className="h-16 w-16 text-primary/30 mx-auto mb-4" />
-            <h2 className="text-2xl font-display font-bold mb-2">Your cart is empty</h2>
-            <p className="text-muted-foreground mb-6">Add some delicious products!</p>
+            <h2 className="text-2xl font-display font-bold mb-2">{t("cart.emptyCart")}</h2>
+            <p className="text-muted-foreground mb-6">{t("cart.addProducts")}</p>
             <Link href="/shop">
               <button className="bg-primary text-white px-8 py-3 rounded-xl font-semibold hover:bg-primary/90 transition">
-                Browse Shop
+                {t("cart.browseShop")}
               </button>
             </Link>
           </motion.div>
@@ -166,13 +168,13 @@ export default function Cart() {
                 onClick={() => clearMutation.mutate({ data: undefined } as any, { onSuccess: invalidateCart })}
                 className="text-sm text-muted-foreground hover:text-red-500 transition flex items-center gap-1"
               >
-                <Trash2 className="h-3.5 w-3.5" /> Clear cart
+                <Trash2 className="h-3.5 w-3.5" /> {t("cart.clearCart")}
               </button>
             </div>
 
             {/* Order Summary */}
             <div className="bg-white rounded-2xl shadow-sm p-6 h-fit">
-              <h2 className="font-display font-bold text-xl mb-4">Order Summary</h2>
+              <h2 className="font-display font-bold text-xl mb-4">{t("cart.orderSummary")}</h2>
               <div className="space-y-2 mb-4">
                 {cartItems.map((item) => (
                   <div key={item.id} className="flex justify-between text-sm text-muted-foreground">
@@ -182,7 +184,7 @@ export default function Cart() {
                 ))}
               </div>
               <div className="border-t pt-3 flex justify-between font-bold text-lg">
-                <span>Total</span>
+                <span>{t("cart.total")}</span>
                 <span className="text-primary">${total.toFixed(2)}</span>
               </div>
 
@@ -191,16 +193,16 @@ export default function Cart() {
                   onClick={() => setShowCheckout(true)}
                   className="w-full mt-6 bg-primary text-white py-3 rounded-xl font-semibold hover:bg-primary/90 transition flex items-center justify-center gap-2 shadow-lg shadow-primary/30"
                 >
-                  Proceed to Checkout <ArrowRight className="h-4 w-4" />
+                  {t("cart.proceedToCheckout")} <ArrowRight className="h-4 w-4" />
                 </button>
               ) : (
                 <div className="mt-6 space-y-3">
-                  <label className="block text-sm font-medium">Shipping Address</label>
+                  <label className="block text-sm font-medium">{t("cart.shippingAddress")}</label>
                   <textarea
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     rows={3}
-                    placeholder="Enter your shipping address…"
+                    placeholder={t("cart.addressPlaceholder")}
                     className="w-full px-3 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none"
                   />
                   <button
@@ -208,7 +210,7 @@ export default function Cart() {
                     disabled={checkingOut}
                     className="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-primary/90 transition disabled:opacity-60 shadow-lg shadow-primary/30"
                   >
-                    {checkingOut ? "Placing order…" : "Place Order"}
+                    {checkingOut ? t("cart.placingOrder") : t("cart.placeOrder")}
                   </button>
                 </div>
               )}

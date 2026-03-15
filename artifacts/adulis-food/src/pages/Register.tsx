@@ -6,10 +6,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import { getGetMeQueryKey } from "@workspace/api-client-react";
 import { Phone, KeyRound, User, Lock, ArrowRight, CheckCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTranslation } from "react-i18next";
 
 type Step = "phone" | "otp" | "details";
 
 export default function Register() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -34,7 +36,7 @@ export default function Register() {
   const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!phone.trim()) { setError("Enter a valid phone number"); return; }
+    if (!phone.trim()) { setError(t("register.errors.enterPhone")); return; }
     sendOtpMutation.mutate(
       { data: { phone } },
       {
@@ -42,7 +44,7 @@ export default function Register() {
           if (data.devOtp) setDevOtp(data.devOtp);
           setStep("otp");
         },
-        onError: (err: any) => setError(err?.data?.error ?? "Failed to send OTP"),
+        onError: (err: any) => setError(err?.data?.error ?? t("register.errors.sendOtpFailed")),
       }
     );
   };
@@ -50,16 +52,16 @@ export default function Register() {
   const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (otpCode.length !== 4) { setError("Enter the 4-digit code"); return; }
+    if (otpCode.length !== 4) { setError(t("register.errors.enter4Digit")); return; }
     setStep("details");
   };
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!name.trim()) { setError("Name is required"); return; }
-    if (password.length < 6) { setError("Password must be at least 6 characters"); return; }
-    if (password !== confirm) { setError("Passwords do not match"); return; }
+    if (!name.trim()) { setError(t("register.errors.nameRequired")); return; }
+    if (password.length < 6) { setError(t("register.errors.passwordLength")); return; }
+    if (password !== confirm) { setError(t("register.errors.passwordMatch")); return; }
     registerMutation.mutate(
       { data: { name, phone, password, otpCode } },
       {
@@ -67,15 +69,15 @@ export default function Register() {
           queryClient.setQueryData(getGetMeQueryKey(), data);
           setLocation("/products");
         },
-        onError: (err: any) => setError(err?.data?.error ?? "Registration failed"),
+        onError: (err: any) => setError(err?.data?.error ?? t("register.errors.registrationFailed")),
       }
     );
   };
 
   const steps = [
-    { id: "phone", label: "Phone", icon: Phone },
-    { id: "otp", label: "Verify", icon: KeyRound },
-    { id: "details", label: "Account", icon: User },
+    { id: "phone", label: t("register.stepPhone"), icon: Phone },
+    { id: "otp", label: t("register.stepVerify"), icon: KeyRound },
+    { id: "details", label: t("register.stepAccount"), icon: User },
   ];
 
   return (
@@ -86,15 +88,14 @@ export default function Register() {
         transition={{ duration: 0.5 }}
         className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md"
       >
-        {/* Logo */}
         <div className="text-center mb-6">
           <img
             src="https://superboostup.com/AdulisFarm/wp-content/uploads/2026/01/logo-removebg-preview.png"
             alt="Logo"
             className="h-14 mx-auto mb-3"
           />
-          <h1 className="text-2xl font-display font-bold text-foreground">Create Account</h1>
-          <p className="text-muted-foreground text-sm mt-1">Join the Adulis family</p>
+          <h1 className="text-2xl font-display font-bold text-foreground">{t("register.createAccount")}</h1>
+          <p className="text-muted-foreground text-sm mt-1">{t("register.joinFamily")}</p>
         </div>
 
         {/* Step indicator */}
@@ -135,7 +136,6 @@ export default function Register() {
         )}
 
         <AnimatePresence mode="wait">
-          {/* Step 1: Phone */}
           {step === "phone" && (
             <motion.form
               key="phone"
@@ -146,7 +146,7 @@ export default function Register() {
               className="space-y-4"
             >
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Phone Number</label>
+                <label className="block text-sm font-medium text-foreground mb-1">{t("register.phoneNumber")}</label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <input
@@ -158,19 +158,18 @@ export default function Register() {
                     className="w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 transition"
                   />
                 </div>
-                <p className="text-xs text-muted-foreground mt-1.5">A 4-digit verification code will be sent to this number.</p>
+                <p className="text-xs text-muted-foreground mt-1.5">{t("register.otpSent")}</p>
               </div>
               <button
                 type="submit"
                 disabled={sendOtpMutation.isPending}
                 className="w-full bg-primary text-white font-semibold py-3 rounded-xl hover:bg-primary/90 transition disabled:opacity-60 shadow-lg shadow-primary/30 flex items-center justify-center gap-2"
               >
-                {sendOtpMutation.isPending ? "Sending OTP…" : <>Send Verification Code <ArrowRight className="h-4 w-4" /></>}
+                {sendOtpMutation.isPending ? t("register.sendingOtp") : <>{t("register.sendCode")} <ArrowRight className="h-4 w-4" /></>}
               </button>
             </motion.form>
           )}
 
-          {/* Step 2: OTP */}
           {step === "otp" && (
             <motion.form
               key="otp"
@@ -185,13 +184,13 @@ export default function Register() {
                   <KeyRound className="h-7 w-7 text-primary" />
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Enter the 4-digit code sent to <strong className="text-foreground">{phone}</strong>
+                  {t("register.enterCode")} <strong className="text-foreground">{phone}</strong>
                 </p>
               </div>
 
               {devOtp && (
                 <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-center">
-                  <p className="text-xs text-amber-700 font-medium">Your verification code:</p>
+                  <p className="text-xs text-amber-700 font-medium">{t("register.yourCode")}</p>
                   <p className="text-3xl font-bold text-amber-800 tracking-[0.4em] mt-1">{devOtp}</p>
                 </div>
               )}
@@ -211,19 +210,18 @@ export default function Register() {
                 type="submit"
                 className="w-full bg-primary text-white font-semibold py-3 rounded-xl hover:bg-primary/90 transition shadow-lg shadow-primary/30 flex items-center justify-center gap-2"
               >
-                Verify Code <ArrowRight className="h-4 w-4" />
+                {t("register.verifyCode")} <ArrowRight className="h-4 w-4" />
               </button>
               <button
                 type="button"
                 onClick={() => { setStep("phone"); setOtpCode(""); setDevOtp(null); }}
                 className="w-full text-sm text-muted-foreground hover:text-foreground transition py-2"
               >
-                ← Change phone number
+                {t("register.changePhone")}
               </button>
             </motion.form>
           )}
 
-          {/* Step 3: Name + Password */}
           {step === "details" && (
             <motion.form
               key="details"
@@ -234,7 +232,7 @@ export default function Register() {
               className="space-y-4"
             >
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Full Name</label>
+                <label className="block text-sm font-medium text-foreground mb-1">{t("register.fullName")}</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <input
@@ -248,7 +246,7 @@ export default function Register() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Password</label>
+                <label className="block text-sm font-medium text-foreground mb-1">{t("register.password")}</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <input
@@ -257,13 +255,13 @@ export default function Register() {
                     minLength={6}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Min. 6 characters"
+                    placeholder={t("register.minPassword")}
                     className="w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 transition"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Confirm Password</label>
+                <label className="block text-sm font-medium text-foreground mb-1">{t("register.confirmPassword")}</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <input
@@ -271,7 +269,7 @@ export default function Register() {
                     required
                     value={confirm}
                     onChange={(e) => setConfirm(e.target.value)}
-                    placeholder="Repeat password"
+                    placeholder={t("register.repeatPassword")}
                     className="w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 transition"
                   />
                 </div>
@@ -281,15 +279,15 @@ export default function Register() {
                 disabled={registerMutation.isPending}
                 className="w-full bg-primary text-white font-semibold py-3 rounded-xl hover:bg-primary/90 transition disabled:opacity-60 shadow-lg shadow-primary/30 flex items-center justify-center gap-2"
               >
-                {registerMutation.isPending ? "Creating account…" : <>Create Account <CheckCircle className="h-4 w-4" /></>}
+                {registerMutation.isPending ? t("register.creating") : <>{t("register.createAccount")} <CheckCircle className="h-4 w-4" /></>}
               </button>
             </motion.form>
           )}
         </AnimatePresence>
 
         <p className="text-center text-sm text-muted-foreground mt-6">
-          Already have an account?{" "}
-          <Link href="/login" className="text-primary font-semibold hover:underline">Sign In</Link>
+          {t("register.haveAccount")}{" "}
+          <Link href="/login" className="text-primary font-semibold hover:underline">{t("register.signIn")}</Link>
         </p>
       </motion.div>
     </div>
