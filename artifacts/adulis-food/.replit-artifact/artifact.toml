@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Adulis Food Complex"
+version = "1.0.0"
+id = "artifacts/adulis-food"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+localPort = 23019
+name = "web"
+paths = ["/"]
+
+[services.development]
+run = "pnpm --filter @workspace/adulis-food run dev"
+
+[services.env]
+PORT = "23019"
+BASE_PATH = "/"
+
+[services.production]
+build = ["pnpm", "--filter", "@workspace/adulis-food", "run", "build"]
+publicDir = "artifacts/adulis-food/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
