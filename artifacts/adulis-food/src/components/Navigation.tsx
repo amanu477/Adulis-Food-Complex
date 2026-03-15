@@ -14,7 +14,6 @@ const navLinks = [
 ];
 
 export function Navigation() {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [location] = useLocation();
@@ -23,21 +22,11 @@ export function Navigation() {
   const { user, isAdmin, logout } = useAuth();
   const { count: cartCount } = useCart();
 
-  const isHomePage = location === "/";
-
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   useEffect(() => {
     setMobileMenuOpen(false);
     setUserMenuOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [location]);
-
-  const transparent = isHomePage && !isScrolled;
 
   return (
     <>
@@ -46,11 +35,7 @@ export function Navigation() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-          transparent
-            ? "bg-transparent py-5"
-            : "bg-background/90 backdrop-blur-xl shadow-sm border-b border-border/50 py-3"
-        }`}
+        className="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-xl shadow-sm border-b border-border/50 py-3"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
@@ -60,7 +45,7 @@ export function Navigation() {
                 alt="Adulis Food Complex Logo"
                 className="h-12 w-auto object-contain transition-transform duration-500 group-hover:scale-110 group-hover:rotate-2"
               />
-              <span className={`font-display text-xl font-bold hidden sm:block transition-colors duration-300 ${transparent ? "text-white drop-shadow-md" : "text-foreground"}`}>
+              <span className="font-display text-xl font-bold hidden sm:block text-foreground">
                 Adulis Food Complex
               </span>
             </Link>
@@ -73,9 +58,7 @@ export function Navigation() {
                     key={link.name}
                     href={link.href}
                     className={`text-sm font-medium relative group px-1 py-2 ${
-                      transparent
-                        ? isActive ? "text-primary drop-shadow-md" : "text-white/90 hover:text-white drop-shadow-sm"
-                        : isActive ? "text-primary" : "text-foreground/70 hover:text-foreground"
+                      isActive ? "text-primary" : "text-foreground/70 hover:text-foreground"
                     }`}
                   >
                     {link.name}
@@ -95,7 +78,7 @@ export function Navigation() {
 
               {/* Cart */}
               <Link href="/cart" className="relative">
-                <button className={`p-2 rounded-full transition-colors ${transparent ? "text-white hover:bg-white/10" : "text-foreground/70 hover:bg-muted"}`}>
+                <button className="p-2 rounded-full transition-colors text-foreground/70 hover:bg-muted">
                   <ShoppingCart className="h-5 w-5" />
                   {cartCount > 0 && (
                     <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold">
@@ -110,9 +93,7 @@ export function Navigation() {
                 <div className="relative">
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className={`flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-full transition-colors ${
-                      transparent ? "text-white bg-white/10 hover:bg-white/20" : "text-foreground bg-muted hover:bg-muted/80"
-                    }`}
+                    className="flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-full transition-colors text-foreground bg-muted hover:bg-muted/80"
                   >
                     <User className="h-4 w-4" />
                     <span className="max-w-[80px] truncate">{user.name?.split(" ")[0] ?? "User"}</span>
@@ -150,7 +131,7 @@ export function Navigation() {
               ) : (
                 <div className="flex items-center gap-2">
                   <Link href="/login">
-                    <button className={`text-sm font-medium px-3 py-2 rounded-full transition-colors ${transparent ? "text-white hover:bg-white/10" : "text-foreground/70 hover:text-foreground"}`}>
+                    <button className="text-sm font-medium px-3 py-2 rounded-full transition-colors text-foreground/70 hover:text-foreground">
                       Sign In
                     </button>
                   </Link>
@@ -166,7 +147,7 @@ export function Navigation() {
             {/* Mobile buttons */}
             <div className="md:hidden flex items-center gap-2">
               <Link href="/cart" className="relative">
-                <button className={`p-2 rounded-full ${transparent ? "text-white" : "text-foreground"}`}>
+                <button className="p-2 rounded-full text-foreground">
                   <ShoppingCart className="h-5 w-5" />
                   {cartCount > 0 && (
                     <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold">
@@ -176,7 +157,7 @@ export function Navigation() {
                 </button>
               </Link>
               <button
-                className={`p-2 rounded-full backdrop-blur-md transition-colors ${transparent ? "text-white bg-black/20" : "text-foreground bg-muted"}`}
+                className="p-2 rounded-full backdrop-blur-md transition-colors text-foreground bg-muted"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
                 {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}

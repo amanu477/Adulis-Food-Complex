@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import {
-  Users, Package, ShoppingBag, Trash2, Edit, ToggleLeft, ToggleRight, Plus, X, Check
+  Users, Package, ShoppingBag, Trash2, Edit, ToggleLeft, ToggleRight, Plus, X, Check, Upload, Link as LinkIcon
 } from "lucide-react";
 import {
   useAdminListUsers,
@@ -56,6 +56,10 @@ export default function Admin() {
     name: "", description: "", price: "", imageUrl: "", category: "Snacks", stock: "10", active: true, badge: "",
   });
   const [showProductForm, setShowProductForm] = useState(false);
+  const [imageInputMode, setImageInputMode] = useState<"upload" | "url">("upload");
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!user || !isAdmin) {
     return (
@@ -91,6 +95,19 @@ export default function Admin() {
     deleteProductMutation.mutate({ id: productId }, { onSuccess: () => { invalidateProducts(); toast({ title: "Product deleted" }); } });
   };
 
+  const handleImageFile = (file: File) => {
+    if (!file) return;
+    setUploadingImage(true);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      setImagePreview(dataUrl);
+      setProductForm((f) => ({ ...f, imageUrl: dataUrl }));
+      setUploadingImage(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const openProductForm = (product?: any) => {
     if (product) {
       setEditingProduct(product);
@@ -104,9 +121,13 @@ export default function Admin() {
         active: product.active,
         badge: product.badge ?? "",
       });
+      setImagePreview(product.imageUrl ?? "");
+      setImageInputMode("upload");
     } else {
       setEditingProduct(null);
       setProductForm({ name: "", description: "", price: "", imageUrl: "", category: "Snacks", stock: "10", active: true, badge: "" });
+      setImagePreview("");
+      setImageInputMode("upload");
     }
     setShowProductForm(true);
   };
@@ -335,7 +356,6 @@ export default function Admin() {
             <div className="space-y-3">
               {[
                 { label: "Name", key: "name", type: "text" },
-                { label: "Image URL", key: "imageUrl", type: "text" },
                 { label: "Price ($)", key: "price", type: "number" },
                 { label: "Stock", key: "stock", type: "number" },
                 { label: "Badge (optional)", key: "badge", type: "text" },
@@ -350,6 +370,83 @@ export default function Admin() {
                   />
                 </div>
               ))}
+
+              {/* Image field */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-sm font-medium">Product Image</label>
+                  <div className="flex rounded-lg overflow-hidden border border-border text-xs">
+                    <button
+                      type="button"
+                      onClick={() => setImageInputMode("upload")}
+                      className={`px-2.5 py-1 flex items-center gap-1 transition ${imageInputMode === "upload" ? "bg-primary text-white" : "bg-white text-foreground/60 hover:bg-muted"}`}
+                    >
+                      <Upload className="h-3 w-3" /> Upload
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImageInputMode("url")}
+                      className={`px-2.5 py-1 flex items-center gap-1 transition ${imageInputMode === "url" ? "bg-primary text-white" : "bg-white text-foreground/60 hover:bg-muted"}`}
+                    >
+                      <LinkIcon className="h-3 w-3" /> URL
+                    </button>
+                  </div>
+                </div>
+
+                {imageInputMode === "upload" ? (
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const file = e.dataTransfer.files[0];
+                      if (file) handleImageFile(file);
+                    }}
+                    className="w-full border-2 border-dashed border-border rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition min-h-[100px]"
+                  >
+                    {uploadingImage ? (
+                      <p className="text-sm text-muted-foreground">Processing...</p>
+                    ) : imagePreview ? (
+                      <div className="flex flex-col items-center gap-2 w-full">
+                        <img src={imagePreview} alt="Preview" className="h-24 w-full object-contain rounded-lg" />
+                        <p className="text-xs text-muted-foreground">Click to change image</p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-1 text-muted-foreground">
+                        <Upload className="h-6 w-6" />
+                        <p className="text-sm font-medium">Click or drag & drop to upload</p>
+                        <p className="text-xs">PNG, JPG, WebP supported</p>
+                      </div>
+                    )}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleImageFile(file);
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      placeholder="https://example.com/image.jpg"
+                      value={productForm.imageUrl.startsWith("data:") ? "" : productForm.imageUrl}
+                      onChange={(e) => {
+                        setProductForm({ ...productForm, imageUrl: e.target.value });
+                        setImagePreview(e.target.value);
+                      }}
+                      className="w-full px-3 py-2.5 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                    />
+                    {imagePreview && !imagePreview.startsWith("data:") && imagePreview.startsWith("http") && (
+                      <img src={imagePreview} alt="Preview" className="h-20 w-full object-contain rounded-lg border border-border" />
+                    )}
+                  </div>
+                )}
+              </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Category</label>
                 <select
