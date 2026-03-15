@@ -108,7 +108,7 @@ export default function Home() {
       transition: {
         duration: 3 + Math.random() * 4,
         repeat: Infinity,
-        ease: "easeInOut",
+        ease: "easeInOut" as const,
         delay: i * 0.2,
       },
     }),

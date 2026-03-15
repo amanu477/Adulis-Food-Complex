@@ -23,7 +23,9 @@ export default function Cart() {
   const [checkingOut, setCheckingOut] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
 
-  const { data: cartItems = [], isLoading } = useGetCart({ query: { enabled: !!user } });
+  const { data: cartItems = [], isLoading } = useGetCart({
+    query: { queryKey: getGetCartQueryKey(), enabled: !!user },
+  });
   const updateMutation = useUpdateCartItem();
   const removeMutation = useRemoveCartItem();
   const clearMutation = useClearCart();

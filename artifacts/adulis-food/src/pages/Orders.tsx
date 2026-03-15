@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { Package, ChevronRight } from "lucide-react";
-import { useListMyOrders } from "@workspace/api-client-react";
+import { useListMyOrders, getListMyOrdersQueryKey } from "@workspace/api-client-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const STATUS_COLORS: Record<string, string> = {
@@ -14,7 +14,9 @@ const STATUS_COLORS: Record<string, string> = {
 
 export default function Orders() {
   const { user } = useAuth();
-  const { data: orders = [], isLoading } = useListMyOrders({ query: { enabled: !!user } });
+  const { data: orders = [], isLoading } = useListMyOrders({
+    query: { queryKey: getListMyOrdersQueryKey(), enabled: !!user },
+  });
 
   if (!user) {
     return (

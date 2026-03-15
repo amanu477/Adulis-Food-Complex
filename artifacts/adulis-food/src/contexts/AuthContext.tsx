@@ -6,7 +6,8 @@ import { getGetMeQueryKey } from "@workspace/api-client-react";
 interface AuthUser {
   id: number;
   name: string;
-  email: string;
+  email?: string | null;
+  phone?: string | null;
   role: string;
 }
 
@@ -28,7 +29,9 @@ const AuthContext = createContext<AuthContextValue>({
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
-  const { data: user, isLoading, refetch } = useGetMe({ query: { retry: false } });
+  const { data: user, isLoading, refetch } = useGetMe({
+    query: { queryKey: getGetMeQueryKey(), retry: false },
+  });
   const logoutMutation = useLogout();
 
   const logout = () => {

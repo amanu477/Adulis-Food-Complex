@@ -14,7 +14,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { data: cartItems } = useGetCart({
-    query: { enabled: !!user, retry: false },
+    query: { queryKey: getGetCartQueryKey(), enabled: !!user, retry: false },
   });
 
   const count = cartItems?.reduce((sum, item) => sum + item.quantity, 0) ?? 0;

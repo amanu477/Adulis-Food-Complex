@@ -40,9 +40,9 @@ export default function Admin() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: users = [] } = useAdminListUsers({ query: { enabled: isAdmin } });
-  const { data: orders = [] } = useAdminListOrders({ query: { enabled: isAdmin } });
-  const { data: products = [] } = useAdminListProducts({ query: { enabled: isAdmin } });
+  const { data: users = [] } = useAdminListUsers({ query: { queryKey: getAdminListUsersQueryKey(), enabled: isAdmin } });
+  const { data: orders = [] } = useAdminListOrders({ query: { queryKey: getAdminListOrdersQueryKey(), enabled: isAdmin } });
+  const { data: products = [] } = useAdminListProducts({ query: { queryKey: getAdminListProductsQueryKey(), enabled: isAdmin } });
 
   const updateUserMutation = useAdminUpdateUser();
   const deleteUserMutation = useAdminDeleteUser();
