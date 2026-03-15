@@ -1,0 +1,25 @@
+{
+  "name": "workspace",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "preinstall": "node -e \"const fs=require('fs'); ['package-lock.json','yarn.lock'].forEach((f)=>{if(fs.existsSync(f)) fs.rmSync(f)}); const ua=process.env.npm_config_user_agent||''; if(!ua.startsWith('pnpm/')){console.error('Use pnpm instead'); process.exit(1);}\"",
+    "start": "pnpm run dev:web",
+    "dev": "pnpm -r --parallel --filter @workspace/adulis-food --filter @workspace/api-server run dev",
+    "dev:web": "pnpm --filter @workspace/adulis-food run dev",
+    "dev:api": "pnpm --filter @workspace/api-server run dev",
+    "build": "pnpm run typecheck && pnpm -r --if-present run build",
+    "typecheck:libs": "tsc --build",
+    "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
+  },
+  "private": true,
+  "optionalDependencies": {
+    "@rollup/rollup-win32-x64-msvc": "^4.59.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/oxide-win32-x64-msvc": "^4.2.1",
+    "lightningcss-win32-x64-msvc": "^1.32.0",
+    "prettier": "^3.8.1",
+    "typescript": "~5.9.2"
+  }
+}
