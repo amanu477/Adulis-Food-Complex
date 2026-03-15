@@ -115,7 +115,7 @@ export function Navigation() {
                     }`}
                   >
                     <User className="h-4 w-4" />
-                    <span className="max-w-[80px] truncate">{user.name.split(" ")[0]}</span>
+                    <span className="max-w-[80px] truncate">{user.name?.split(" ")[0] ?? "User"}</span>
                   </button>
                   <AnimatePresence>
                     {userMenuOpen && (
