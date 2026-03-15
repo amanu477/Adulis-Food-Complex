@@ -1,13 +1,20 @@
 import { config } from "dotenv";
-import { resolve, dirname } from "path";
-import { fileURLToPath } from "url";
+import { existsSync } from "fs";
+import { resolve } from "path";
+import app from "./app";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const envCandidates = [
+  resolve(process.cwd(), ".env"),
+  resolve(process.cwd(), "../.env"),
+  resolve(process.cwd(), "../../.env"),
+];
 
-config({ path: resolve(__dirname, "../../../.env") });
-
-const { default: app } = await import("./app");
+for (const envPath of envCandidates) {
+  if (existsSync(envPath)) {
+    config({ path: envPath });
+    break;
+  }
+}
 
 const rawPort = process.env["PORT"] ?? "8080";
 
