@@ -14,14 +14,15 @@ if (Number.isNaN(port) || port <= 0) {
 
 const basePath = process.env.BASE_PATH ?? "/";
 
+const isReplit = process.env.REPL_ID !== undefined;
+
 export default defineConfig({
   base: basePath,
   plugins: [
     react(),
     tailwindcss(),
     runtimeErrorOverlay(),
-    ...(process.env.NODE_ENV !== "production" &&
-    process.env.REPL_ID !== undefined
+    ...(process.env.NODE_ENV !== "production" && isReplit
       ? [
           await import("@replit/vite-plugin-cartographer").then((m) =>
             m.cartographer({
@@ -53,6 +54,16 @@ export default defineConfig({
       strict: true,
       deny: ["**/.*"],
     },
+    ...(isReplit
+      ? {}
+      : {
+          proxy: {
+            "/api": {
+              target: "http://localhost:8080",
+              changeOrigin: true,
+            },
+          },
+        }),
   },
   preview: {
     port,
